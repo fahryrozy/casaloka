@@ -16,23 +16,23 @@ const PartnerLogo: React.FC<PartnerLogoProps> = ({ src, alt }) => {
 const LksPartner: React.FC = () => {
   const partners = [
     {
-      src: "https://via.placeholder.com/120x50?text=Hijra+Bank",
+      src: "/assets/images/lsk-partner-1.png",
       alt: "Hijra Bank",
     },
     {
-      src: "https://via.placeholder.com/120x50?text=BSI",
+      src: "/assets/images/lsk-partner-2.png",
       alt: "Bank Syariah Indonesia",
     },
     {
-      src: "https://via.placeholder.com/120x50?text=Dana+Syariah",
+      src: "/assets/images/lsk-partner-3.png",
       alt: "Dana Syariah",
     },
     {
-      src: "https://via.placeholder.com/120x50?text=BTN+Syariah",
+      src: "/assets/images/lsk-partner-4.png",
       alt: "BTN Syariah",
     },
     {
-      src: "https://via.placeholder.com/120x50?text=BPRS+Al+Salaam",
+      src: "/assets/images/lsk-partner-5.png",
       alt: "BPRS Al Salaam",
     },
   ];

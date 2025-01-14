@@ -6,34 +6,37 @@ interface Partner {
 }
 
 const partners: Partner[] = [
-  { name: "AD Tien Realty", logo: "/assets/partners/ad-tien-realty.png" },
-  { name: "Medina Tower", logo: "/assets/partners/medina-tower.png" },
-  { name: "Ahsanu Residence", logo: "/assets/partners/ahsanu-residence.png" },
+  { name: "AD Tien Realty", logo: "/assets/images/ad-tien 1.png" },
+  { name: "Medina Tower", logo: "/assets/images/medina_th 1.png" },
+  { name: "Ahsanu Residence", logo: "/assets/images/ahsanu_residence2 1.png" },
   {
     name: "Al Ihsan Residence 2",
-    logo: "/assets/partners/al-ihsan-residence.png",
+    logo: "/assets/images/alihsan_residence2 2.png",
   },
-  { name: "Golden Land", logo: "/assets/partners/golden-land.png" },
-  { name: "Griya Tavisha 3", logo: "/assets/partners/griya-tavisha.png" },
-  { name: "Azzam Residencia", logo: "/assets/partners/azzam-residencia.png" },
-  { name: "BSI Bank Syariah Indonesia", logo: "/assets/partners/bsi-bank.png" },
+  { name: "Golden Land", logo: "/assets/images/golden-land-color 1.png" },
+  { name: "Griya Tavisha 3", logo: "/assets/images/griya_tavisha_3 2.png" },
+  { name: "Azzam Residencia", logo: "/assets/images/azzam-residencia.png" },
+  {
+    name: "BSI Bank Syariah Indonesia",
+    logo: "/assets/images/lsk-partner-4.png",
+  },
   {
     name: "Hisan Madinah Village",
     logo: "/assets/partners/hisan-madinah-village.png",
   },
-  { name: "Dana Syariah", logo: "/assets/partners/dana-syariah.png" },
-  { name: "Hisan Townhouse", logo: "/assets/partners/hisan-townhouse.png" },
-  { name: "Kamang Kolonie", logo: "/assets/partners/kamang-kolonie.png" },
-  { name: "Hijra Bank", logo: "/assets/partners/hijra-bank.png" },
-  { name: "BTN Syariah", logo: "/assets/partners/btn-syariah.png" },
+  { name: "Dana Syariah", logo: "/assets/images/lsk-partner-3.png" },
+  { name: "Hisan Townhouse", logo: "/assets/images/image 10.png" },
+  { name: "Kamang Kolonie", logo: "assets/images/image 11.png" },
+  { name: "Hijra Bank", logo: "/assets/images/lsk-partner-1.png" },
+  { name: "BTN Syariah", logo: "/assets/images/lsk-partner-2.pngg" },
   {
     name: "Jatisari Luxury Residence",
-    logo: "/assets/partners/jatisari-residence.png",
+    logo: "/assets/images/jatisari-residence 1.png",
   },
-  { name: "Tasnim", logo: "/assets/partners/tasnim.png" },
-  { name: "Salak View", logo: "/assets/partners/salak-view.png" },
-  { name: "Rabbani Bintaro", logo: "/assets/partners/rabbani-bintaro.png" },
-  { name: "Raudhatul Jannah", logo: "/assets/partners/raudhatul-jannah.png" },
+  { name: "Tasnim", logo: "/assets/images/tasnim 1.png" },
+  { name: "Salak View", logo: "/assets/images/salak_view 1.png" },
+  { name: "Rabbani Bintaro", logo: "/assets/images/rabbani_bintaro 1.png" },
+  { name: "Raudhatul Jannah", logo: "/assets/images/raudhatul_jannah 2.png" },
 ];
 
 const OurPartners: React.FC = () => {
