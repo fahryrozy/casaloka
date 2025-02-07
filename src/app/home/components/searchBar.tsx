@@ -1,11 +1,73 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { formatCurrency } from "@/app/utils/formatCurrency";
+import Image from "next/image";
+import BackSpace from "@/app/assets/icons/backspace.svg";
 
 const SearchBar: React.FC = () => {
   const router = useRouter();
   const [priceDropdownOpen, setPriceDropdownOpen] = useState(false);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(0);
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+
+  const [isPriceError, setIsPriceError] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (minPrice !== 0 && maxPrice !== 0) {
+      setIsPriceError(minPrice < 1000 || maxPrice < minPrice);
+    } else {
+      setIsPriceError(false);
+    }
+  }, [minPrice, maxPrice]);
+
+  const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(event.target.value.replace(/[^0-9]/g, ""));
+    setMinPrice(value);
+  };
+
+  const handleMaxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(event.target.value.replace(/[^0-9]/g, ""));
+    setMaxPrice(value);
+  };
+
+  const handleLocationChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setSelectedLocation(event.target.value);
+  };
+
+  const handleSearch = () => {
+    const query = new URLSearchParams();
+    if (minPrice !== 0) query.append("minPrice", minPrice.toString());
+    if (maxPrice !== 0) query.append("maxPrice", maxPrice.toString());
+    if (selectedLocation) query.append("location", selectedLocation);
+    router.push(`/search?${query.toString()}`);
+  };
+
+  const clearPrices = () => {
+    setMinPrice(0);
+    setMaxPrice(0);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setPriceDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full px-8 mt-2">
@@ -24,7 +86,8 @@ const SearchBar: React.FC = () => {
               <span className="text-primary text-lg">📍</span>
               <select
                 className="w-full bg-transparent text-black outline-none text-sm font-medium"
-                defaultValue=""
+                value={selectedLocation}
+                onChange={handleLocationChange}
               >
                 <option value="" disabled>
                   Select option
@@ -41,33 +104,64 @@ const SearchBar: React.FC = () => {
             <label className=" flex w-1/2 sm:w-full items-center justify-end sm:justify-start text-sm font-medium text-gray-600">
               Harga
             </label>
-            <button
-              type="button"
-              className="flex gap-2 items-center w-full text-left text-sm font-medium"
-              onClick={() => setPriceDropdownOpen(!priceDropdownOpen)}
-            >
-              <span className="text-blue-600 text-lg">🏠</span>
-              Atur Harga
-            </button>
+            <div className="flex items-center gap-2 w-full">
+              <button
+                type="button"
+                className="flex gap-2 items-center w-full text-left text-sm font-medium"
+                onClick={() => setPriceDropdownOpen(!priceDropdownOpen)}
+              >
+                <span className="text-blue-600 text-lg">🏠</span>
+                {minPrice !== 0 || maxPrice !== 0
+                  ? `${formatCurrency(
+                      minPrice.toString()
+                    )} s/d ${formatCurrency(maxPrice.toString())}`
+                  : "Atur Harga"}
+              </button>
+              {minPrice !== 0 && maxPrice !== 0 && (
+                <button
+                  type="button"
+                  className="w-10 text-sm"
+                  onClick={clearPrices}
+                >
+                  <Image src={BackSpace} alt="Clear" width={16} height={16} />
+                </button>
+              )}
+            </div>
             {priceDropdownOpen && (
-              <div className="flex flex-row gap-2 absolute top-full mt-4 left-0 bg-white shadow-lg border rounded-lg p-4 z-10 w-full">
+              <div
+                ref={dropdownRef}
+                className="flex flex-row gap-2 absolute top-full mt-4 left-0 bg-white shadow-lg border rounded-lg p-4 z-10 w-full"
+              >
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Min"
+                  value={formatCurrency(minPrice.toString())}
+                  onChange={handleMinChange}
                   className="w-full border border-gray-300 px-3 py-2 rounded-lg"
+                  min={1000000}
+                  step={100}
                 />
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Max"
+                  value={
+                    maxPrice !== null ? formatCurrency(maxPrice.toString()) : ""
+                  }
+                  onChange={handleMaxChange}
                   className="w-full border border-gray-300 px-3 py-2 rounded-lg"
+                  min={minPrice}
+                  step={100}
                 />
               </div>
             )}
           </div>
           {/* Search Button */}
           <button
-            onClick={() => router.push("/search")}
-            className="bg-primary w-full sm:w-1/2 text-white px-4 py-2 rounded-lg"
+            onClick={handleSearch}
+            className={`bg-primary w-full sm:w-1/2 text-white px-4 py-2 rounded-lg ${
+              isPriceError ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={isPriceError}
           >
             Cari Sekarang
           </button>
