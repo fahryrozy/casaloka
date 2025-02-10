@@ -20,7 +20,7 @@ const PropertySpecs: React.FC<PropertySpecsProps> = ({
   buildingArea,
 }) => {
   return (
-    <div className="bg-white p-4 flex flex-col gap-4 shadow mt-4">
+    <div className="bg-white p-4 flex flex-col gap-4 shadow">
       <div className="text-blue-600 font-bold text-2xl mt-2">
         {formatCurrency(price)}
       </div>

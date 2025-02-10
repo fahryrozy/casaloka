@@ -1,6 +1,6 @@
-import React from "react";
-
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { submitLogin } from "@/app/utils/api";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -9,6 +9,29 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const body = {
+      username,
+      user_type: "",
+      password,
+    };
+
+    try {
+      const response = await submitLogin(body);
+      console.log("Login successful:", response);
+      // Handle successful login (e.g., redirect to dashboard)
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Handle login failure (e.g., show error message)
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -25,20 +48,31 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
         {/* Modal Content */}
         <h2 className="text-xl text-black font-bold mb-4">Log In</h2>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleLogin}>
           <div>
             <input
-              type="email"
-              placeholder="Masukkan Email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Masukkan email anda"
+              className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div>
+          <div className="relative">
             <input
-              type="password"
+              type={passwordVisible ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute inset-y-0 right-0 px-3 py-2 text-gray-600"
+            >
+              {passwordVisible ? "Hide" : "Show"}
+            </button>
           </div>
           <div className="flex items-center justify-between">
             <label className="flex items-center text-gray-600">

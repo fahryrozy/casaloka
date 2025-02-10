@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import OverlayDialog from "../surveyScheduler";
+import DatePickerDialog from "@/app/components/datePicker";
 import "./datepicker.scss";
 
 const ContactCasaloka: React.FC = () => {
@@ -13,6 +11,7 @@ const ContactCasaloka: React.FC = () => {
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
     setStep("time");
+    setShowDateTimePicker(false);
   };
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +20,6 @@ const ContactCasaloka: React.FC = () => {
 
   const handleScheduleClick = () => {
     setShowDateTimePicker(true);
-    setStep("date");
   };
 
   const handleSubmit = () => {
@@ -60,20 +58,22 @@ const ContactCasaloka: React.FC = () => {
         </button>
       </div>
 
-      <OverlayDialog isOpen={showDateTimePicker} onClose={handleClose}>
-        <div className="flex flex-col gap-4">
-          {step === "date" && (
-            <DatePicker
-              selected={selectedDate}
-              onChange={handleDateChange}
-              dateFormat="dd/MM/yyyy"
-              className="border p-2 rounded w-full"
-              placeholderText="Pilih Tanggal"
-              inline
-            />
-          )}
-          {step === "time" && (
-            <>
+      <DatePickerDialog
+        isOpen={showDateTimePicker}
+        onClose={handleClose}
+        onDateChange={handleDateChange}
+        onSubmit={handleClose}
+      />
+      {step === "time" && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative w-full max-w-md mx-auto">
+            <button
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+              onClick={handleClose}
+            >
+              &times;
+            </button>
+            <div className="flex flex-col gap-4">
               <input
                 type="time"
                 value={selectedTime}
@@ -95,10 +95,10 @@ const ContactCasaloka: React.FC = () => {
                   Submit
                 </button>
               </div>
-            </>
-          )}
+            </div>
+          </div>
         </div>
-      </OverlayDialog>
+      )}
     </div>
   );
 };

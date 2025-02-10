@@ -10,6 +10,11 @@ const aesIv = "1230912854278345";
 const api = axios.create({
   baseURL: "https://newapidev.casaloka.id",
 });
+const endpoint = {
+  login: "/api/v1.0.0/login",
+  getPropertyList: "/api/v1.0.0/getpropertilist",
+  register: "/api/v1.0.0/registeruser",
+};
 
 export const generateHeaders = () => {
   const dateNow = new Date();
@@ -59,7 +64,14 @@ export const setSignature = (jsonBody: object) => {
 export const getPropertyList = async () => {
   try {
     const headers = generateHeaders();
-    const requestBody = {
+    const requestBody: {
+      page_size: string;
+      current_page: string;
+      search: string;
+      orderby: string;
+      orderby_index: string;
+      signature?: string;
+    } = {
       page_size: "all",
       current_page: "1",
       search: "",
@@ -68,16 +80,73 @@ export const getPropertyList = async () => {
     };
 
     const signature = setSignature(requestBody);
-    requestBody["signature"] = signature;
+    requestBody.signature = signature;
 
-    const response = await api.post(
-      "/api/v1.0.0/getpropertilist",
-      requestBody,
-      { headers }
-    );
+    const response = await api.post(endpoint.getPropertyList, requestBody, {
+      headers,
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching property list:", error);
+    throw error;
+  }
+};
+
+export const submitLogin = async (body: {
+  username: string;
+  user_type: string;
+  password: string;
+}) => {
+  try {
+    const headers = generateHeaders();
+
+    const encryptedPassword = aesEncrypt(body.password);
+    const requestBody = {
+      ...body,
+      password: encryptedPassword,
+    };
+
+    const signature = setSignature(requestBody);
+    requestBody["signature"] = signature;
+
+    const response = await api.post(endpoint.login, requestBody, { headers });
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting login:", error);
+    throw error;
+  }
+};
+
+export const submitRegister = async (body: {
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  email: string;
+  password: string;
+  ulangi_password: string;
+  user_group_id: string;
+  url_verify: string;
+}) => {
+  try {
+    const headers = generateHeaders();
+
+    const encryptedPassword = aesEncrypt(body.password);
+    const encryptedUlangiPassword = aesEncrypt(body.ulangi_password);
+    const requestBody = {
+      ...body,
+      password: encryptedPassword,
+      ulangi_password: encryptedUlangiPassword,
+    };
+
+    const signature = setSignature(requestBody);
+    requestBody["signature"] = signature;
+
+    const response = await api.post(endpoint.register, requestBody, {
+      headers,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error submitting registration:", error);
     throw error;
   }
 };

@@ -1,20 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useRef } from "react";
-import { formatCurrency } from "@/app/utils/formatCurrency";
-import Image from "next/image";
-import BackSpace from "@/app/assets/icons/backspace.svg";
+import React, { useEffect, useState } from "react";
+import PriceFilter from "@/app/components/priceFilter";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const SearchBar: React.FC = () => {
   const router = useRouter();
-  const [priceDropdownOpen, setPriceDropdownOpen] = useState(false);
-  const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(0);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
 
   const [isPriceError, setIsPriceError] = useState<boolean>(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(0);
 
   useEffect(() => {
     if (minPrice !== 0 && maxPrice !== 0) {
@@ -23,16 +20,6 @@ const SearchBar: React.FC = () => {
       setIsPriceError(false);
     }
   }, [minPrice, maxPrice]);
-
-  const handleMinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(event.target.value.replace(/[^0-9]/g, ""));
-    setMinPrice(value);
-  };
-
-  const handleMaxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(event.target.value.replace(/[^0-9]/g, ""));
-    setMaxPrice(value);
-  };
 
   const handleLocationChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -48,27 +35,6 @@ const SearchBar: React.FC = () => {
     router.push(`/search?${query.toString()}`);
   };
 
-  const clearPrices = () => {
-    setMinPrice(0);
-    setMaxPrice(0);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node)
-    ) {
-      setPriceDropdownOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <div className="w-full px-8 mt-2">
       <div className="bg-white w-4/5 py-2 px-6 shadow-2xl drop-shadow-2xl rounded-lg mx-auto">
@@ -83,7 +49,7 @@ const SearchBar: React.FC = () => {
               Lokasi
             </label>
             <div className="w-full flex items-center gap-2 ">
-              <span className="text-primary text-lg">📍</span>
+              <FaMapMarkerAlt className="text-primary text-lg" />
               <select
                 className="w-full bg-transparent text-black outline-none text-sm font-medium"
                 value={selectedLocation}
@@ -100,68 +66,19 @@ const SearchBar: React.FC = () => {
           <div className="sm:h-12 sm:w-[1px] hidden sm:flex sm:mx-4 w-3/4 h-1 bg-gray-400"></div>
           <hr className="sm:hidden w-full bg-gray-400" />
           {/* Price Filter */}
-          <div className="w-full flex flex-row justify-center sm:flex-col items-center gap-8 sm:gap-2 relative flex-grow">
-            <label className=" flex w-1/2 sm:w-full items-center justify-end sm:justify-start text-sm font-medium text-gray-600">
-              Harga
-            </label>
-            <div className="flex items-center gap-2 w-full">
-              <button
-                type="button"
-                className="flex gap-2 items-center w-full text-left text-sm font-medium"
-                onClick={() => setPriceDropdownOpen(!priceDropdownOpen)}
-              >
-                <span className="text-blue-600 text-lg">🏠</span>
-                {minPrice !== 0 || maxPrice !== 0
-                  ? `${formatCurrency(
-                      minPrice.toString()
-                    )} s/d ${formatCurrency(maxPrice.toString())}`
-                  : "Atur Harga"}
-              </button>
-              {minPrice !== 0 && maxPrice !== 0 && (
-                <button
-                  type="button"
-                  className="w-10 text-sm"
-                  onClick={clearPrices}
-                >
-                  <Image src={BackSpace} alt="Clear" width={16} height={16} />
-                </button>
-              )}
-            </div>
-            {priceDropdownOpen && (
-              <div
-                ref={dropdownRef}
-                className="flex flex-row gap-2 absolute top-full mt-4 left-0 bg-white shadow-lg border rounded-lg p-4 z-10 w-full"
-              >
-                <input
-                  type="text"
-                  placeholder="Min"
-                  value={formatCurrency(minPrice.toString())}
-                  onChange={handleMinChange}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg"
-                  min={1000000}
-                  step={100}
-                />
-                <input
-                  type="text"
-                  placeholder="Max"
-                  value={
-                    maxPrice !== null ? formatCurrency(maxPrice.toString()) : ""
-                  }
-                  onChange={handleMaxChange}
-                  className="w-full border border-gray-300 px-3 py-2 rounded-lg"
-                  min={minPrice}
-                  step={100}
-                />
-              </div>
-            )}
-          </div>
+          <PriceFilter
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            setMinPrice={setMinPrice}
+            setMaxPrice={setMaxPrice}
+          />
           {/* Search Button */}
           <button
+            disabled={isPriceError}
             onClick={handleSearch}
             className={`bg-primary w-full sm:w-1/2 text-white px-4 py-2 rounded-lg ${
               isPriceError ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={isPriceError}
           >
             Cari Sekarang
           </button>

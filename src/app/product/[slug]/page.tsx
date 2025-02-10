@@ -5,12 +5,12 @@ import { useParams } from "next/navigation";
 import Header from "@/app/components/header";
 import Footer from "@/app/components/footer";
 import { getPropertyList } from "@/app/utils/api";
-import Image from "next/image";
 import SimulasiCicilan from "../components/simulateInstallment";
 import ContactCasaloka from "../components/contactCasaloka";
 import TontonVideo from "../components/videoProduct";
 import PropertySpecs from "../components/propertySpecs";
 import PropertyDetails from "../components/propertyDetails";
+import PropertyImageCarousel from "../components/propertyImages/";
 
 interface PropertyImage {
   log_number: string;
@@ -89,29 +89,12 @@ const ProductDetails: React.FC = () => {
   return (
     <div className="flex flex-col overflow-x-hidden">
       <Header />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 mt-14">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left Section */}
-          <div className="col-span-3 flex flex-col gap-4">
-            <Image
-              src={`https://newapidev.casaloka.id${product.properti_image_list[0].image_url_real}`}
-              alt={product.nama}
-              width={800}
-              height={600}
-              className="w-full h-auto object-cover rounded-lg shadow-lg"
-            />
-            <div className="flex space-x-2 mt-4 overflow-x-auto">
-              {product.properti_image_list.map((image, index) => (
-                <Image
-                  key={index}
-                  src={`https://newapidev.casaloka.id${image.image_url_real}`}
-                  alt={`Thumbnail ${index}`}
-                  width={100}
-                  height={100}
-                  className="w-20 h-20 object-cover rounded-lg shadow"
-                />
-              ))}
-            </div>
+          <div className="col-span-3 flex flex-col gap-4 overflow-hidden">
+            <PropertyImageCarousel images={product.properti_image_list} />
+
             <PropertyDetails
               bedrooms={product.kamar_tidur}
               bathrooms={product.kamar_mandi}

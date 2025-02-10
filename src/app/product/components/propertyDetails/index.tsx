@@ -24,7 +24,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
   description,
 }) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow mt-4">
+    <div className="bg-white p-4 rounded-lg shadow-2xl mt-4">
       <div className="mt-6">
         <h3 className="font-bold text-lg mb-2">Detail</h3>
         <ul className="space-y-1">
@@ -41,7 +41,7 @@ const PropertyDetails: React.FC<PropertyDetailsProps> = ({
       <hr className="my-4" />
       <div>
         <h3 className="font-bold text-lg mb-2">Deskripsi</h3>
-        <p className="text-gray-700">{description}</p>
+        <p className="text-gray-700 whitespace-pre-line">{`${description}`}</p>
       </div>
     </div>
   );

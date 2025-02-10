@@ -1,8 +1,39 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Header from "../components/header";
+import { submitRegister } from "@/app/utils/api";
 
 const Register = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const body = {
+      first_name: firstName,
+      last_name: lastName,
+      phone_number: phoneNumber,
+      email,
+      password,
+      ulangi_password: confirmPassword,
+      user_group_id: "1",
+      url_verify: "http://127.0.0.1",
+    };
+
+    try {
+      const response = await submitRegister(body);
+      console.log("Registration successful:", response);
+      // Handle successful registration (e.g., redirect to login page)
+    } catch (error) {
+      console.error("Registration failed:", error);
+      // Handle registration failure (e.g., show error message)
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center bg-white">
       <Header />
@@ -14,16 +45,20 @@ const Register = () => {
           Daftarkan dirimu & cari rumah impianmu bersama kami.
         </p>
 
-        <form className="w-full mt-6 space-y-4">
+        <form className="w-full mt-6 space-y-4" onSubmit={handleRegister}>
           <div className="flex space-x-4">
             <input
               type="text"
               placeholder="Nama Depan"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               className="w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
             />
             <input
               type="text"
               placeholder="Nama Belakang"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               className="w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
             />
           </div>
@@ -31,21 +66,29 @@ const Register = () => {
           <input
             type="tel"
             placeholder="Masukkan No. Telepon"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <input
             type="email"
             placeholder="Masukkan Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <input
             type="password"
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <input
             type="password"
             placeholder="Konfirmasi Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
           />
 
