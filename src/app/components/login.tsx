@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { submitLogin } from "@/app/utils/api";
+import { signIn } from "next-auth/react"; // Use NextAuth
+// import { submitLogin } from "@/app/utils/api";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -11,25 +12,40 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const body = {
-      username,
-      user_type: "",
-      password,
-    };
+    setError(null);
+    setLoading(true);
 
     try {
-      const response = await submitLogin(body);
-      console.log("Login successful:", response);
-      // Handle successful login (e.g., redirect to dashboard)
+      console.log("📩 Sending login request with:", { username, password });
+
+      const result = await signIn("credentials", {
+        redirect: false, // Prevent auto-redirect
+        username,
+        password,
+      });
+
+      console.log("🔍 Login result:", result);
+
+      if (result?.error) {
+        setError("Login failed: " + result.error);
+      } else {
+        console.log("success with => ", result); // Redirect to dashboard only on success
+      }
     } catch (error) {
-      console.error("Login failed:", error);
-      // Handle login failure (e.g., show error message)
+      setError("Unexpected error. Please try again.");
+      console.error("🚨 Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,6 +64,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
         {/* Modal Content */}
         <h2 className="text-xl text-black font-bold mb-4">Log In</h2>
+
+        {error && <p className="text-red-600">{error}</p>}
+
         <form className="space-y-4" onSubmit={handleLogin}>
           <div>
             <input
@@ -74,6 +93,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               {passwordVisible ? "Hide" : "Show"}
             </button>
           </div>
+
           <div className="flex items-center justify-between">
             <label className="flex items-center text-gray-600">
               <input type="checkbox" className="mr-2" /> Ingat Saya
@@ -82,11 +102,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               Lupa Password?
             </a>
           </div>
+
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            disabled={loading}
           >
-            Masuk
+            {loading ? "Logging in..." : "Masuk"}
           </button>
         </form>
 
@@ -99,10 +121,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
         {/* Social Login */}
         <div className="flex justify-between space-x-4">
-          <button className="flex-grow bg-gray-100 text-gray-600 py-2 rounded-md hover:bg-gray-200">
+          <button
+            onClick={() => signIn("google")}
+            className="flex-grow bg-gray-100 text-gray-600 py-2 rounded-md hover:bg-gray-200"
+          >
             Masuk dengan Google
           </button>
-          <button className="flex-grow bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">
+          <button
+            onClick={() => signIn("facebook")}
+            className="flex-grow bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          >
             Masuk dengan Facebook
           </button>
         </div>

@@ -4,8 +4,11 @@ import React, { useState } from "react";
 import LoginModal from "./login";
 import SmoothScrollLink from "./smoothScrollLink";
 import SideNav from "./sideNav";
+import { signOut, useSession } from "next-auth/react";
 
 const Header: React.FC = () => {
+  const { data: session, status } = useSession();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
@@ -44,18 +47,28 @@ const Header: React.FC = () => {
             <SmoothScrollLink href="/#contact-us" className="hover:underline">
               Kontak
             </SmoothScrollLink>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 border border-white rounded text-white hover:bg-white hover:text-blue-600"
-            >
-              Masuk
-            </button>
-            <button
-              onClick={() => router.push("/register")}
-              className="px-4 py-2 bg-white rounded text-primary hover:bg-gray-200"
-            >
-              Daftar
-            </button>
+
+            {session ? (
+              <>
+                <div>Welcome {session.user?.name}</div>
+                <button onClick={() => signOut()}>Sign out</button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="px-4 py-2 border border-white rounded text-white hover:bg-white hover:text-blue-600"
+                >
+                  Masuk
+                </button>
+                <button
+                  onClick={() => router.push("/register")}
+                  className="px-4 py-2 bg-white rounded text-primary hover:bg-gray-200"
+                >
+                  Daftar
+                </button>
+              </>
+            )}
           </nav>
           {/* Hamburger Menu */}
           <div className="sm:hidden">

@@ -1,6 +1,7 @@
 import axios from "axios";
 import crypto from "crypto-js";
 import moment from "moment";
+import { getSession } from "next-auth/react";
 
 const clientId = "01001";
 const clientKey = "ebfadf891b7ec6b80f11cf2d3331ead65032e802";
@@ -61,6 +62,17 @@ export const setSignature = (jsonBody: object) => {
   return signature;
 };
 
+export const getPropertyDetail = async (slug: string) => {
+  const session = await getSession();
+  if (!session?.user?.token) {
+    throw new Error("No token found");
+  }
+  const response = await axios.get("/api/protected-route", {
+    headers: { Authorization: `Bearer ${session.user.token}` },
+  });
+  return response.data;
+};
+
 export const getPropertyList = async () => {
   try {
     const headers = generateHeaders();
@@ -99,7 +111,7 @@ export const submitLogin = async (body: {
 }) => {
   try {
     const headers = generateHeaders();
-
+    console.log("request body", body);
     const encryptedPassword = aesEncrypt(body.password);
     const requestBody = {
       ...body,
