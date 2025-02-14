@@ -1,5 +1,7 @@
 import React from "react";
 import SmoothScrollLink from "./smoothScrollLink";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface SideNavProps {
   isOpen: boolean;
@@ -14,6 +16,17 @@ const SideNav: React.FC<SideNavProps> = ({
   onLoginClick,
   onRegisterClick,
 }) => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const getInitials = (name: string) => {
+    const initials = name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+    return initials.toUpperCase();
+  };
+
   return (
     <div
       className={`fixed top-0 right-0 h-full w-2/3 bg-primary text-white transition-all duration-300 ease-in-out ${
@@ -73,24 +86,52 @@ const SideNav: React.FC<SideNavProps> = ({
         >
           Kontak
         </SmoothScrollLink>
-        <button
-          onClick={() => {
-            onClose();
-            onLoginClick();
-          }}
-          className="px-4 py-2 border border-white rounded text-white hover:bg-white hover:text-blue-600"
-        >
-          Masuk
-        </button>
-        <button
-          onClick={() => {
-            onClose();
-            onRegisterClick();
-          }}
-          className="px-4 py-2 bg-white rounded text-primary hover:bg-gray-200"
-        >
-          Daftar
-        </button>
+
+        {session ? (
+          <>
+            <div className="relative">
+              <button
+                onClick={() => router.push("/profile")}
+                className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center"
+              >
+                {getInitials(session.user?.name || "")}
+              </button>
+              <button
+                onClick={() => router.push("/favorites")}
+                className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+              >
+                Favorites
+              </button>
+              <button
+                onClick={() => signOut()}
+                className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+              >
+                Sign out
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => {
+                onClose();
+                onLoginClick();
+              }}
+              className="px-4 py-2 border border-white rounded text-white hover:bg-white hover:text-blue-600"
+            >
+              Masuk
+            </button>
+            <button
+              onClick={() => {
+                onClose();
+                onRegisterClick();
+              }}
+              className="px-4 py-2 bg-white rounded text-primary hover:bg-gray-200"
+            >
+              Daftar
+            </button>
+          </>
+        )}
       </nav>
     </div>
   );

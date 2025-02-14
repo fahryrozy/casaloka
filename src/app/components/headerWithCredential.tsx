@@ -1,26 +1,45 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LoginModal from "./login";
 import SmoothScrollLink from "./smoothScrollLink";
 import SideNav from "./sideNav";
 import { signOut, useSession } from "next-auth/react";
+import Cookies from "js-cookie";
 
 const Header: React.FC = () => {
-  const { data: session } = useSession();
+  const { data: socialAuthUser } = useSession();
+  const [credentialAuthUser, setCredentialAuthUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = Cookies.get("user");
+    if (storedUser) {
+      setCredentialAuthUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     console.log("Menu is open", isMenuOpen);
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+
+  const handleLogout = () => {
+    if (socialAuthUser) {
+      signOut(); // Next-Auth logout
+    } else {
+      Cookies.remove("token");
+      Cookies.remove("user");
+      setCredentialAuthUser(null);
+      router.push("/login");
+    }
   };
 
   const getInitials = (name: string) => {
@@ -62,14 +81,18 @@ const Header: React.FC = () => {
               Kontak
             </SmoothScrollLink>
 
-            {session ? (
+            {socialAuthUser || credentialAuthUser ? (
               <>
                 <div className="relative">
                   <button
                     onClick={toggleDropdown}
                     className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center"
                   >
-                    {getInitials(session.user?.name || "")}
+                    {getInitials(
+                      socialAuthUser?.user?.name ||
+                        credentialAuthUser?.name ||
+                        ""
+                    )}
                   </button>
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
@@ -86,7 +109,7 @@ const Header: React.FC = () => {
                         Favorites
                       </button>
                       <button
-                        onClick={() => signOut()}
+                        onClick={handleLogout}
                         className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
                       >
                         Sign out

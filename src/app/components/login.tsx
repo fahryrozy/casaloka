@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react"; // Use NextAuth
-// import { submitLogin } from "@/app/utils/api";
+import { signIn } from "next-auth/react"; // Use
+import { authenticate } from "@/action";
+import { submitLogin } from "../utils/api";
 
 interface LoginModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
@@ -15,6 +16,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -28,39 +41,70 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     try {
       console.log("📩 Sending login request with:", { username, password });
 
+      // const result = await authenticate(username, password);
       const result = await signIn("credentials", {
-        redirect: false, // Prevent auto-redirect
         username,
         password,
+        redirect: false,
+        callbackUrl: window.location.href,
       });
 
       console.log("🔍 Login result:", result);
 
       if (result?.error) {
-        setError("Login failed: " + result.error);
+        setError(result?.code);
       } else {
-        console.log("success with => ", result); // Redirect to dashboard only on success
+        if (onClose) onClose();
+        router.refresh();
       }
     } catch (error) {
-      setError("Unexpected error. Please try again.");
-      console.error("🚨 Login error:", error);
+      setError("Unexpected error occurred. Please try again later.");
+      console.log("🚨 Log the error:", error.toString());
     } finally {
       setLoading(false);
     }
   };
 
+  // const handleLogin = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setError(null);
+  //   setLoading(true);
+
+  //   try {
+  //     const result = await submitLogin({
+  //       username,
+  //       user_type: "",
+  //       password,
+  //     });
+
+  //     if (result?.error) {
+  //       setError(result.message);
+  //     } else {
+  //       if (onClose) onClose();
+  //       router.refresh();
+  //     }
+  //   } catch (error) {
+  //     setError(error.response?.data?.message || "Unexpected error occurred.");
+  //     console.error("🚨 Log the error:", error.toString());
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black backdrop-blur-lg bg-opacity-50 flex items-center justify-center z-[1000000]">
       <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative">
         {/* Close Button */}
-        <button
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          onClick={onClose}
-        >
-          &times;
-        </button>
+        {onClose && (
+          <button
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            onClick={onClose}
+          >
+            &times;
+          </button>
+        )}
 
         {/* Modal Content */}
         <h2 className="text-xl text-black font-bold mb-4">Log In</h2>
@@ -140,7 +184,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           Belum punya akun Casaloka?{" "}
           <button
             onClick={() => {
-              onClose(); // Close the modal before navigating
+              if (onClose) onClose();
               router.push("/register");
             }}
             className="text-blue-600 hover:underline"

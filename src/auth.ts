@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
@@ -15,7 +15,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
     }),
     CredentialsProvider({
-      //   name: "credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
@@ -23,58 +22,84 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         try {
-          console.log("📩 Received credentials:", credentials);
           const { username, password } = credentials;
+          console.log("📩 Sending login request with:", credentials);
           const response = await submitLogin({
             username,
             user_type: "",
             password,
           });
-          console.log("Login successful:", response);
 
-          console.log("📡 API Response Status:", response.status);
-
-          if (response.status !== 200) {
-            throw new Error(`API error: ${response.message}`);
+          if (!response || response.status !== 200) {
+            console.log("🔴 Login error with not 200:", response);
+            return null;
           }
 
           const user = response.data;
-          console.log("👤 User from API:", user);
 
           if (!user.token) {
-            throw new Error("Token not received");
+            throw new Error(user.response?.data?.message || "Login failed");
           }
 
-          // Return user data with token
           return {
-            id: user.log_number, // You can use log_number as the user ID
+            id: user.log_number,
             token: user.token,
             email: user.email,
             name: `${user.first_name} ${user.last_name}`.trim(),
           };
         } catch (error) {
-          console.error("🚨 Login error:", error);
-          return null; // Return `null` instead of throwing to prevent NextAuth from failing completely
+          console.error("🚨 Login error this:", error.response?.data);
+
+          throw new InvalidLoginError(error.response?.data?.message);
+          // throw error;
+          // throw new CustomAuthError(error.response?.data?.message);
+          // throw new Error(error.response?.data?.message || "Login failed");
         }
       },
     }),
   ],
-  secret: process.env.AUTH_SECRET,
+  debug: true,
+  trustHost: true,
+
+  secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.accessToken = user.token; // Store JWT token
+        token.accessToken = user.token;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
-        session.user.token = token.accessToken; // Store JWT in session
+        session.user.token = token.accessToken;
       }
       return session;
     },
   },
 });
+
+class InvalidLoginError extends CredentialsSignin {
+  // code = "Invalid identifier or password";
+  static code: string;
+
+  constructor(message?: any) {
+    super();
+
+    this.code = message;
+  }
+}
+
+import { AuthError } from "next-auth";
+
+export class CustomAuthError extends AuthError {
+  static type: string;
+
+  constructor(message?: any) {
+    super();
+
+    this.type = message;
+  }
+}

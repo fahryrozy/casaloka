@@ -122,6 +122,7 @@ export const submitLogin = async (body: {
     requestBody["signature"] = signature;
 
     const response = await api.post(endpoint.login, requestBody, { headers });
+    console.log("response =>", JSON.stringify(response.data));
     return response.data;
   } catch (error) {
     console.error("Error submitting login:", error);
@@ -161,4 +162,59 @@ export const submitRegister = async (body: {
     console.error("Error submitting registration:", error);
     throw error;
   }
+};
+
+export const submitLoginCookie = async (body: {
+  username: string;
+  user_type: string;
+  password: string;
+}) => {
+  // try {
+  const headers = generateHeaders();
+  console.log("request body", body);
+  const encryptedPassword = aesEncrypt(body.password);
+  const requestBody = {
+    ...body,
+    password: encryptedPassword,
+  };
+
+  const signature = setSignature(requestBody);
+  requestBody["signature"] = signature;
+
+  console.log("request body", requestBody);
+
+  const response = await api.post(endpoint.login, requestBody, { headers });
+  console.log("response => ", JSON.stringify(response));
+
+  const { log_number, token, email, first_name, last_name } =
+    response?.data?.data;
+
+  const user = {
+    id: log_number,
+    token: token,
+    email: email,
+    name: `${first_name} ${last_name}`.trim(),
+  };
+
+  if (response.data?.data?.token) {
+    // Store token in HTTP-only cookies (Recommended)
+    Cookies.set("token", token, {
+      expires: 7,
+      secure: true,
+      sameSite: "Strict",
+    });
+    Cookies.set("user", JSON.stringify(user), {
+      expires: 7,
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    console.log("Token saved in cookies!");
+  }
+  console.log("response.data", response.data);
+  return response.data;
+  // } catch (error) {
+  //   console.error("Error submitting login:", error);
+  //   throw error;
+  // }
 };
