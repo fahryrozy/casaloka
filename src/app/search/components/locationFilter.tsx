@@ -132,7 +132,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   return (
     <div className="w-full flex flex-col space-y-2 max-h-[30vh] overflow-y-scroll">
       <div
-        className="w-full cursor-pointer flex sticky top-0 z-10"
+        className="w-full cursor-pointer flex sticky top-0 bg-white z-10"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <label className="w-full font-bold">Indonesia</label>{" "}
@@ -145,7 +145,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
           {provinces.map((province) => (
             <div key={province.code}>
               <input
-                type="checkbox"
+                type="radio"
                 value={province.code}
                 onChange={handleProvinceChange}
                 checked={selectedProvince === province.code}
@@ -159,7 +159,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                     .map((city) => (
                       <div key={city.code}>
                         <input
-                          type="checkbox"
+                          type="radio"
                           value={city.code}
                           onChange={handleCityChange}
                           checked={selectedCity === city.code}
@@ -175,7 +175,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
                               .map((district) => (
                                 <div key={district.code}>
                                   <input
-                                    type="checkbox"
+                                    type="radio"
                                     value={district.code}
                                     onChange={handleDistrictChange}
                                     checked={selectedDistrict === district.code}

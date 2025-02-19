@@ -7,6 +7,7 @@ import LoveEmptyIcon from "../../assets/icons/love-empty.svg";
 import LoveFillIcon from "../../assets/icons/love-fill.svg";
 import { formatCurrency } from "@/app/utils/formatCurrency";
 import { IPropertyListData } from "@/app/utils/api/interfaces/IProperty";
+import NoProperties from "./NoProperties";
 
 interface PropertyListProps {
   properties: IPropertyListData[];
@@ -25,6 +26,9 @@ const PropertyList: React.FC<PropertyListProps> = ({
     router.push(`/product/${property.slug}`);
   };
 
+  if (properties.length === 0) {
+    return <NoProperties />;
+  }
   return (
     <div className="w-full flex flex-col gap-4">
       {properties.map((property) => (

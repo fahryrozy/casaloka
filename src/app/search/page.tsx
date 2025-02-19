@@ -9,6 +9,7 @@ import { getPropertyList } from "../utils/api/services/propertyService";
 import SearchSkeleton from "./components/searchSkeleton";
 import { IPropertyListData } from "../utils/api/interfaces/IProperty";
 import { useSearchParams } from "next/navigation";
+import useStore from "@/app/store/useStore"; // Import the Zustand store
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -18,11 +19,14 @@ function SearchPageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const propertiesPerPage = 5;
 
-  const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(0);
-  const minPriceParams = searchParams.get("minPrice");
-  const maxPriceParams = searchParams.get("maxPrice");
-  const loc = searchParams.get("loc");
+  const {
+    minPrice,
+    maxPrice,
+    setMinPrice,
+    setMaxPrice,
+    selectedLocation,
+    setSelectedLocation,
+  } = useStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -33,7 +37,8 @@ function SearchPageContent() {
   const [certifications, setCertifications] = useState<string[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [selectedProvince, setSelectedProvince] =
+    useState<string>(selectedLocation);
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedVillage, setSelectedVillage] = useState<string>("");
@@ -41,34 +46,32 @@ function SearchPageContent() {
   const [filters, setFilters] = useState({});
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    setSelectedProvince(loc ? loc : "");
-    setMinPrice(minPriceParams ? parseInt(minPriceParams) : 0);
-    setMaxPrice(maxPriceParams ? parseInt(maxPriceParams) : 0);
-  }, [minPriceParams, maxPriceParams, loc]);
-
-  const fetchProperties = useCallback(async () => {
-    setIsLoading(true);
-    getPropertyList({
-      search: searchQuery,
-      current_page: currentPage.toString(),
-      page_size: propertiesPerPage.toString(),
-      filter: filters,
-    })
-      .then(({ properties, totalItems }) => {
-        setProperties(properties);
-        setTotalItems(totalItems);
+  const fetchProperties = useCallback(
+    async (query: string) => {
+      setIsLoading(true);
+      getPropertyList({
+        search: query,
+        current_page: currentPage.toString(),
+        page_size: propertiesPerPage.toString(),
+        filter: filters,
       })
-      .catch((error) => {
-        console.error("Failed to fetch properties:", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [searchQuery, currentPage, propertiesPerPage, filters]);
+        .then(({ properties, totalItems }) => {
+          setProperties(properties);
+          setTotalItems(totalItems);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch properties:", error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [currentPage, propertiesPerPage, filters]
+  );
 
   useEffect(() => {
-    fetchProperties();
+    fetchProperties(searchQuery);
   }, [fetchProperties, searchParams]);
 
   const handleDateChange = (date: Date) => {
@@ -103,7 +106,7 @@ function SearchPageContent() {
 
     setFilters(filteredFilter);
     setCurrentPage(1);
-    fetchProperties();
+    fetchProperties(searchQuery);
     setIsFilterSidebarOpen(false); // Close the sidebar after applying filters
   };
 
@@ -116,18 +119,19 @@ function SearchPageContent() {
     setPropertiesFilter([]);
     setCertifications([]);
     setSelectedProvince("");
+    setSelectedLocation("");
     setSelectedCity("");
     setSelectedDistrict("");
     setSelectedVillage("");
     setFilters({});
     setCurrentPage(1);
-    fetchProperties();
+    fetchProperties(searchQuery);
     setIsFilterSidebarOpen(false); // Close the sidebar after resetting filters
   };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    fetchProperties();
+    fetchProperties(searchQuery);
   };
 
   return (
@@ -159,6 +163,7 @@ function SearchPageContent() {
         >
           <SearchHeader
             searchQuery={searchQuery}
+            onEnterPressed={() => fetchProperties(searchQuery)}
             setSearchQuery={setSearchQuery}
             showDatePicker={showDatePicker}
             setShowDatePicker={setShowDatePicker}

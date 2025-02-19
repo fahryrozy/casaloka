@@ -10,6 +10,7 @@ import DatePickerDialog from "@/app/components/datePicker";
 
 interface SearchHeaderProps {
   searchQuery: string;
+  onEnterPressed: () => void;
   setSearchQuery: (query: string) => void;
   showDatePicker: boolean;
   selectedDate: Date | null;
@@ -24,6 +25,7 @@ interface SearchHeaderProps {
 
 const SearchHeader: React.FC<SearchHeaderProps> = ({
   searchQuery,
+  onEnterPressed,
   setSearchQuery,
   showDatePicker,
   selectedDate,
@@ -45,6 +47,11 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
             placeholder="Cari rumah impian"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onEnterPressed();
+              }
+            }}
             className="pl-12 py-3 w-full rounded-lg shadow-sm text-gray-800"
           />
         </div>

@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import PriceFilter from "@/app/components/priceFilter";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { fetchProvinces } from "@/app/utils/api/services/regionService"; // Import the fetchProvinces function
+import { fetchProvinces } from "@/app/utils/api/services/regionService";
+import useStore from "@/app/store/useStore"; // Import the Zustand store
+import { formatCapitalize } from "@/app/utils/formatCapitalize";
 
 interface Province {
   code: string;
@@ -13,12 +15,17 @@ interface Province {
 
 const SearchBar: React.FC = () => {
   const router = useRouter();
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
-  const [provinces, setProvinces] = useState<Province[]>([]); // State to store provinces
+  const {
+    selectedLocation,
+    setSelectedLocation,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+  } = useStore(); // Use Zustand store
+  const [provinces, setProvinces] = useState<Province[]>([]);
 
   const [isPriceError, setIsPriceError] = useState<boolean>(false);
-  const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(0);
 
   useEffect(() => {
     if (minPrice !== 0 && maxPrice !== 0) {
@@ -29,11 +36,13 @@ const SearchBar: React.FC = () => {
   }, [minPrice, maxPrice]);
 
   useEffect(() => {
-    // Fetch provinces when the component mounts
     const fetchProvincesData = async () => {
       try {
         const data = await fetchProvinces();
-        setProvinces(data);
+        const filteredProvinces = data.filter((province) =>
+          ["31", "32", "36"].includes(province.code)
+        );
+        setProvinces(filteredProvinces);
       } catch (error) {
         console.error("Failed to fetch provinces:", error);
       }
@@ -53,18 +62,16 @@ const SearchBar: React.FC = () => {
     if (minPrice !== 0) query.append("minPrice", minPrice.toString());
     if (maxPrice !== 0) query.append("maxPrice", maxPrice.toString());
     if (selectedLocation) query.append("loc", selectedLocation);
-    router.push(`/search?${query.toString()}`);
+    router.push(`/search`);
   };
 
   return (
     <div className="w-full px-8 mt-2">
       <div className="bg-white w-4/5 py-2 px-6 shadow-2xl drop-shadow-2xl rounded-lg mx-auto">
         <div className="flex w-full flex-col sm:flex-row items-center justify-between relative gap-2">
-          {/* Property Tab */}
           <div className="absolute -top-10 px-10 left-1/2 transform -translate-x-1/2 bg-primary text-white py-1.5 rounded-t-3xl text-sm">
             Property
           </div>
-          {/* Location Input */}
           <div className="w-full flex flex-row justify-center items-center sm:flex-col gap-8 sm:gap-2 px-4 sm:py-2 rounded-lg flex-grow">
             <label className="w-1/2 sm:w-full flex justify-end sm:justify-start text-sm font-medium text-gray-600">
               Lokasi
@@ -81,7 +88,7 @@ const SearchBar: React.FC = () => {
                 </option>
                 {provinces.map((province) => (
                   <option key={province.code} value={province.code}>
-                    {province.name}
+                    {formatCapitalize(province.name)}
                   </option>
                 ))}
               </select>
@@ -89,14 +96,12 @@ const SearchBar: React.FC = () => {
           </div>
           <div className="sm:h-12 sm:w-[1px] hidden sm:flex sm:mx-4 w-3/4 h-1 bg-gray-400"></div>
           <hr className="sm:hidden w-full bg-gray-400" />
-          {/* Price Filter */}
           <PriceFilter
             minPrice={minPrice}
             maxPrice={maxPrice}
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
           />
-          {/* Search Button */}
           <button
             disabled={isPriceError}
             onClick={handleSearch}
