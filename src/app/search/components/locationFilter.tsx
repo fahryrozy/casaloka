@@ -12,6 +12,7 @@ import {
   IProvinceData,
   IVillageData,
 } from "@/app/utils/api/interfaces/IRegion";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 interface LocationFilterProps {
   selectedProvince: string;
@@ -42,7 +43,12 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchProvinces().then(setProvinces);
+    fetchProvinces().then((data) => {
+      const filteredProvinces = data.filter((province) =>
+        ["31", "32", "36"].includes(province.code)
+      );
+      setProvinces(filteredProvinces);
+    });
   }, []);
 
   useEffect(() => {
@@ -126,16 +132,12 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
   return (
     <div className="w-full flex flex-col space-y-2 max-h-[30vh] overflow-y-scroll">
       <div
-        className="w-full cursor-pointer flex sticky top-0 bg-white z-10"
+        className="w-full cursor-pointer flex sticky top-0 z-10"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <label className="w-full font-bold">Indonesia</label>{" "}
-        <span
-          className={`ml-4 transform ${
-            isDropdownOpen ? "rotate-180" : "rotate-0"
-          }`}
-        >
-          ▼
+        <span className={`ml-4 mt-1`}>
+          {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
         </span>
       </div>
       {isDropdownOpen && (

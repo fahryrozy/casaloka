@@ -39,6 +39,7 @@ function SearchPageContent() {
   const [selectedVillage, setSelectedVillage] = useState<string>("");
 
   const [filters, setFilters] = useState({});
+  const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
 
   useEffect(() => {
     setSelectedProvince(loc ? loc : "");
@@ -103,6 +104,7 @@ function SearchPageContent() {
     setFilters(filteredFilter);
     setCurrentPage(1);
     fetchProperties();
+    setIsFilterSidebarOpen(false); // Close the sidebar after applying filters
   };
 
   const handleResetFilters = () => {
@@ -120,6 +122,7 @@ function SearchPageContent() {
     setFilters({});
     setCurrentPage(1);
     fetchProperties();
+    setIsFilterSidebarOpen(false); // Close the sidebar after resetting filters
   };
 
   const handlePageChange = (page: number) => {
@@ -128,9 +131,10 @@ function SearchPageContent() {
   };
 
   return (
-    <div className="flex flex-col overflow-x-hidden">
-      <div className="flex flex-col sm:flex-row mt-20">
+    <div className="flex bg-gray-100 flex-col">
+      <div className={`flex flex-col gap-4 sm:flex-row mt-20`}>
         <FilterSidebar
+          isFilterSidebarOpen={isFilterSidebarOpen}
           categories={categories}
           setCategories={setCategories}
           properties={propertiesFilter}
@@ -148,7 +152,11 @@ function SearchPageContent() {
           handleApplyFilters={handleApplyFilters}
           handleResetFilters={handleResetFilters}
         />
-        <div className="flex-grow p-4">
+        <div
+          className={`flex-grow px-4 ${
+            isFilterSidebarOpen ? "hidden" : "slide-in-right"
+          } sm:flex flex-col`}
+        >
           <SearchHeader
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -160,11 +168,12 @@ function SearchPageContent() {
             maxPrice={maxPrice}
             setMinPrice={setMinPrice}
             setMaxPrice={setMaxPrice}
+            setIsFilterSidebarOpen={setIsFilterSidebarOpen} // Pass the state setter to SearchHeader
           />
           {isLoading ? (
             <SearchSkeleton />
           ) : (
-            <>
+            <div className="flex flex-col gap-4 px-2 overflow-hidden mb-10">
               <PropertyList
                 properties={properties}
                 favorites={favorites}
@@ -176,7 +185,7 @@ function SearchPageContent() {
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
               />
-            </>
+            </div>
           )}
         </div>
       </div>

@@ -30,7 +30,7 @@ const PropertyList: React.FC<PropertyListProps> = ({
       {properties.map((property) => (
         <div
           key={property.id}
-          className="relative flex items-center bg-gray-100 p-4 rounded-lg shadow cursor-pointer hover:shadow-lg transition"
+          className="relative flex items-center bg-white p-4 rounded-lg shadow-xl cursor-pointer hover:shadow-md transition"
           onClick={() => navigateToProperty(property)}
         >
           <Image

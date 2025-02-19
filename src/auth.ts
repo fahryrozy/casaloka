@@ -93,9 +93,9 @@ const authOptions: NextAuthConfig = {
     async session({ session, token }: { session: Session; token: AuthJWT }) {
       console.log("🔑 Session:", session);
       console.log("👤 Token:", token);
-      if (session.user) {
-        session.user.id = token.id;
-      }
+      // if (session.user) {
+      //   session.user.id = token.id;
+      // }
       console.log("🔐 Session:", session);
 
       return session;

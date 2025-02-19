@@ -6,6 +6,7 @@ import LoginModal from "./login";
 import SmoothScrollLink from "./smoothScrollLink";
 import SideNav from "./sideNav";
 import { signOut, useSession } from "next-auth/react";
+import { FaBell, FaChevronDown, FaChevronUp } from "react-icons/fa";
 // import { submitLogout } from "../utils/api/services/authService";
 
 const Header: React.FC = () => {
@@ -76,31 +77,53 @@ const Header: React.FC = () => {
             {session ? (
               <>
                 <div className="relative">
-                  <button
-                    onClick={toggleDropdown}
-                    className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center"
-                  >
-                    {getInitials(session.user?.name || "")}
-                  </button>
+                  <div className="relative flex flex-row gap-4">
+                    <button className="w-10 h-10 rounded-full bg-white text-blue-500 flex items-center justify-center">
+                      <FaBell />
+                    </button>
+                    <button
+                      onClick={toggleDropdown}
+                      className="flex flex-row items-center space-x-2"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center">
+                        {getInitials(session.user?.name || "")}
+                      </div>
+                      {session.user?.name && <p>{session.user.name}</p>}
+                      {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                    </button>
+                  </div>
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg z-50">
+                    <div className="absolute flex flex-col px-4 gap-2 -right-2 mt-4 w-72 bg-white text-black rounded-md shadow-2xl z-50">
                       <button
-                        onClick={() => router.push("/profile")}
-                        className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                        onClick={() => router.push("/account")}
+                        className="block px-4 py-2 text-sm hover:font-bold w-full text-left"
                       >
-                        Profile
+                        Akun
                       </button>
                       <button
-                        onClick={() => router.push("/favorites")}
-                        className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                        onClick={() => router.push("/#")}
+                        className="block px-4 py-2 text-sm hover:font-bold w-full text-left"
                       >
-                        Favorites
+                        Rumah Impian
                       </button>
+                      <button
+                        onClick={() => router.push("/#")}
+                        className="block px-4 py-2 text-sm hover:font-bold w-full text-left"
+                      >
+                        Pengaturan Umum
+                      </button>
+                      <button
+                        onClick={() => router.push("/#")}
+                        className="block px-4 py-2 text-sm hover:font-bold w-full text-left"
+                      >
+                        Bantuan
+                      </button>
+                      <hr />
                       <button
                         onClick={() => handleLogout()}
-                        className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                        className="block px-4 py-2 text-sm mb-10 hover:font-bold w-full text-left"
                       >
-                        Sign out
+                        Log out
                       </button>
                     </div>
                   )}

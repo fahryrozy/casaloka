@@ -18,6 +18,8 @@ interface FilterSidebarProps {
   setSelectedVillage: (village: string) => void;
   handleApplyFilters: () => void;
   handleResetFilters: () => void;
+  isFilterSidebarOpen: boolean; // Add a prop for checking if the sidebar is open
+  setIsFilterSidebarOpen?: (isOpen: boolean) => void; // Optional prop for closing the sidebar
 }
 
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
@@ -34,11 +36,17 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   setSelectedVillage,
   handleApplyFilters,
   handleResetFilters,
+  isFilterSidebarOpen,
+  setIsFilterSidebarOpen, // Destructure the optional prop
 }) => {
   return (
-    <div className="hidden sm:flex flex-col sm:w-64 shadow-lg p-2 gap-2">
+    <div
+      className={`${
+        isFilterSidebarOpen ? "flex slide-out-right" : "hidden"
+      } sm:flex flex-col sm:w-64 shadow-lg p-2 gap-2 relative bg-white min-h-screen`}
+    >
       <div className="flex flex-col gap-2">
-        <h3 className="bg-white font-bold mb-4">Kategori</h3>
+        <h3 className="font-bold mb-4">Kategori</h3>
         <ul>
           <li>
             <label>
@@ -124,6 +132,14 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
           Reset
         </button>
       </div>
+      {setIsFilterSidebarOpen && (
+        <button
+          onClick={() => setIsFilterSidebarOpen(false)}
+          className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 sm:hidden"
+        >
+          &times;
+        </button>
+      )}
     </div>
   );
 };

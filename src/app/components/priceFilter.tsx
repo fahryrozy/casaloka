@@ -84,7 +84,7 @@ const PriceFilter: React.FC<PriceFilterProps> = ({
       {priceDropdownOpen && (
         <div
           ref={dropdownRef}
-          className="flex flex-row gap-2 absolute top-full mt-4 left-0 bg-white shadow-lg border rounded-lg p-4 z-10 w-full"
+          className="w-full flex flex-row gap-2 absolute top-full mt-4 left-0 bg-white shadow-lg border rounded-lg p-4 z-10"
         >
           <input
             type="text"
