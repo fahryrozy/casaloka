@@ -50,38 +50,40 @@ const PropertyImageCarousel: React.FC<PropertyImageCarouselProps> = ({
     <div className={styles.embla}>
       <div className={styles.embla__viewport} ref={emblaMainRef}>
         <div className={styles.embla__container}>
-          {images.map((image, index) => (
-            <div className={styles.embla__slide} key={index}>
-              <Image
-                width={1366}
-                height={768}
-                src={`https://newapidev.casaloka.id${image.image_url_real}`}
-                // src={
-                //   "https://i.pinimg.com/736x/41/8c/ec/418cecaf8aa658b09f9161205ea46568.jpg"
-                // }
-                alt={`image-${index}`}
-                className={styles["embla__slide__image"]}
-              />
-            </div>
-          ))}
+          {images &&
+            images.map((image, index) => (
+              <div className={styles.embla__slide} key={index}>
+                <Image
+                  width={1366}
+                  height={768}
+                  src={`https://newapidev.casaloka.id${image.image_url_real}`}
+                  // src={
+                  //   "https://i.pinimg.com/736x/41/8c/ec/418cecaf8aa658b09f9161205ea46568.jpg"
+                  // }
+                  alt={`image-${index}`}
+                  className={styles["embla__slide__image"]}
+                />
+              </div>
+            ))}
         </div>
       </div>
 
       <div className={styles["embla-thumbs"]}>
         <div className={styles["embla-thumbs__viewport"]} ref={emblaThumbsRef}>
           <div className={styles["embla-thumbs__container"]}>
-            {images.map((image, index) => (
-              <Thumb
-                key={index}
-                onClick={() => onThumbClick(index)}
-                selected={index === selectedIndex}
-                index={index}
-                // imgSrc={
-                //   "https://i.pinimg.com/736x/4c/55/3b/4c553b4f46ca691ecbe32d06c6c4d85a.jpg"
-                // }
-                imgSrc={`https://newapidev.casaloka.id${image.image_url_real}`}
-              />
-            ))}
+            {images &&
+              images.map((image, index) => (
+                <Thumb
+                  key={index}
+                  onClick={() => onThumbClick(index)}
+                  selected={index === selectedIndex}
+                  index={index}
+                  // imgSrc={
+                  //   "https://i.pinimg.com/736x/4c/55/3b/4c553b4f46ca691ecbe32d06c6c4d85a.jpg"
+                  // }
+                  imgSrc={`https://newapidev.casaloka.id${image.image_url_real}`}
+                />
+              ))}
           </div>
         </div>
       </div>

@@ -1,6 +1,8 @@
 /* Fullscreen DatePicker */
 .react-datepicker {
   @apply w-full flex flex-col justify-center items-center;
+  border: 0 !important;
+  width: 100% !important;
 }
 
 .react-datepicker__header {

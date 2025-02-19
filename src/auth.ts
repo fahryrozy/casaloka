@@ -1,44 +1,63 @@
-import NextAuth, { CredentialsSignin } from "next-auth";
+import NextAuth, { CredentialsSignin, NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
-import { submitLogin } from "./app/utils/api";
+import { JWT } from "next-auth/jwt";
+import { Session } from "next-auth";
+import { submitLogin } from "@/app/utils/api/services/authService";
+import { ILoginRequest } from "./app/utils/api/interfaces/IAuth";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+// Define JWT Type
+interface AuthJWT extends JWT {
+  id?: string;
+  accessToken?: string;
+}
+
+const authOptions: NextAuthConfig = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     }),
     FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID!,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+      clientId: process.env.FACEBOOK_CLIENT_ID ?? "",
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET ?? "",
     }),
     CredentialsProvider({
+      name: "Credentials",
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
         user_type: { label: "User Type", type: "text" },
       },
-      authorize: async (credentials) => {
+      async authorize(credentials) {
+        if (!credentials || typeof credentials !== "object") {
+          throw new InvalidLoginError("Invalid credentials format");
+        }
+
+        const { username, password } = credentials as ILoginRequest;
+
+        if (!username || !password) {
+          throw new InvalidLoginError("Username and password are required");
+        }
+
         try {
-          const { username, password } = credentials;
           console.log("📩 Sending login request with:", credentials);
           const response = await submitLogin({
             username,
-            user_type: "",
             password,
+            user_type: "",
           });
 
-          if (!response || response.status !== 200) {
-            console.log("🔴 Login error with not 200:", response);
-            return null;
+          if (response.status !== 200) {
+            console.log("🔴 Login error with non-200 status:", response);
+            throw new InvalidLoginError("Login failed with non-200 status");
           }
 
           const user = response.data;
-
+          console.log("🔑 Login response:", user);
           if (!user.token) {
-            throw new Error(user.response?.data?.message || "Login failed");
+            throw new InvalidLoginError(response.message || "Login failed");
           }
 
           return {
@@ -47,59 +66,52 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: user.email,
             name: `${user.first_name} ${user.last_name}`.trim(),
           };
-        } catch (error) {
-          console.error("🚨 Login error this:", error.response?.data);
-
-          throw new InvalidLoginError(error.response?.data?.message);
-          // throw error;
-          // throw new CustomAuthError(error.response?.data?.message);
-          // throw new Error(error.response?.data?.message || "Login failed");
+        } catch (error: any) {
+          console.error("🚨 Login error:", error?.response?.data);
+          throw new InvalidLoginError(
+            error?.response?.data?.message || "Invalid credentials"
+          );
         }
       },
     }),
   ],
   debug: true,
   trustHost: true,
-
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET ?? "",
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
+      console.log("🔑 JWT:", token);
+      console.log("👤 User:", user);
       if (user) {
         token.id = user.id;
-        token.accessToken = user.token;
+        // token.accessToken = (user as AuthUser).token;
       }
       return token;
     },
-    async session({ session, token }) {
+
+    async session({ session, token }: { session: Session; token: AuthJWT }) {
+      console.log("🔑 Session:", session);
+      console.log("👤 Token:", token);
       if (session.user) {
         session.user.id = token.id;
-        session.user.token = token.accessToken;
       }
+      console.log("🔐 Session:", session);
+
       return session;
     },
   },
-});
+};
 
+// Export NextAuth handlers
+export const { handlers, signIn, signOut, auth } = NextAuth(authOptions);
+
+// Custom Error for Invalid Credentials
 class InvalidLoginError extends CredentialsSignin {
-  // code = "Invalid identifier or password";
-  static code: string;
-
-  constructor(message?: any) {
-    super();
-
-    this.code = message;
-  }
-}
-
-import { AuthError } from "next-auth";
-
-export class CustomAuthError extends AuthError {
-  static type: string;
-
-  constructor(message?: any) {
-    super();
-
-    this.type = message;
+  code: string;
+  constructor(message?: string) {
+    super(message || "Invalid credentials");
+    this.code = message || "Invalid credentials";
+    Object.setPrototypeOf(this, InvalidLoginError.prototype);
   }
 }

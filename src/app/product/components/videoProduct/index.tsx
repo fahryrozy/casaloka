@@ -2,7 +2,7 @@ import React from "react";
 
 const TontonVideo: React.FC<{ videoUrl: string }> = ({ videoUrl }) => {
   // Extract the video ID from the provided URL
-  const videoId = videoUrl.split("v=")[1];
+  const videoId = videoUrl && videoUrl.split("v=")[1];
   const embedUrl = `https://www.youtube.com/embed/${videoId}`;
 
   return (

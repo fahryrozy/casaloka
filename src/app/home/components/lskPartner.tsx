@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 interface PartnerLogoProps {
@@ -8,7 +9,13 @@ interface PartnerLogoProps {
 const PartnerLogo: React.FC<PartnerLogoProps> = ({ src, alt }) => {
   return (
     <div className="flex justify-center items-center">
-      <img src={src} alt={alt} className="h-12 mx-4" />
+      <Image
+        width={100}
+        height={100}
+        src={src}
+        alt={alt}
+        className="h-12 mx-4"
+      />
     </div>
   );
 };

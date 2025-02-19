@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./blog.module.scss";
+import Image from "next/image";
 
 interface BlogCardProps {
   image: string;
@@ -10,7 +11,13 @@ interface BlogCardProps {
 const BlogCard: React.FC<BlogCardProps> = ({ image, author, title }) => {
   return (
     <div className={styles.blogCard}>
-      <img src={image} alt={title} className={styles.blogCardImage} />
+      <Image
+        width={500}
+        height={500}
+        src={image}
+        alt={title}
+        className={styles.blogCardImage}
+      />
       <div className={styles.blogCardContent}>
         <p className={styles.blogCardAuthor}>{author}</p>
         <h3 className={styles.blogCardTitle}>{title}</h3>

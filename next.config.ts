@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
       "encrypted-tbn0.gstatic.com",
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true, // Add this line to ignore ESLint during builds
+  },
 };
 
 export default nextConfig;

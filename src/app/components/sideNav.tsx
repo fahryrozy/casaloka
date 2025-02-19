@@ -19,14 +19,6 @@ const SideNav: React.FC<SideNavProps> = ({
   const { data: session } = useSession();
   const router = useRouter();
 
-  const getInitials = (name: string) => {
-    const initials = name
-      .split(" ")
-      .map((n) => n[0])
-      .join("");
-    return initials.toUpperCase();
-  };
-
   return (
     <div
       className={`fixed top-0 right-0 h-full w-2/3 bg-primary text-white transition-all duration-300 ease-in-out ${
@@ -91,20 +83,14 @@ const SideNav: React.FC<SideNavProps> = ({
           <>
             <div className="relative">
               <button
-                onClick={() => router.push("/profile")}
-                className="w-10 h-10 rounded-full bg-gray-500 text-white flex items-center justify-center"
-              >
-                {getInitials(session.user?.name || "")}
-              </button>
-              <button
                 onClick={() => router.push("/favorites")}
-                className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                className="block text-md hover:bg-gray-100 w-full text-left"
               >
                 Favorites
               </button>
               <button
                 onClick={() => signOut()}
-                className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                className="block mt-4 text-md hover:bg-gray-100 w-full text-left"
               >
                 Sign out
               </button>

@@ -1,29 +1,33 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaSearch, FaMapMarkerAlt, FaCalendarAlt } from "react-icons/fa";
 import PriceFilter from "@/app/components/priceFilter";
 import DatePickerDialog from "@/app/components/datePicker";
 
-// Search Header Component
-const SearchHeader: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(0);
+interface SearchHeaderProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  showDatePicker: boolean;
+  selectedDate: Date | null;
+  handleDateChange: (date: Date) => void;
+  setShowDatePicker: (showDatePicker: boolean) => void;
+  minPrice: number;
+  maxPrice: number;
+  setMinPrice: (price: number) => void;
+  setMaxPrice: (price: number) => void;
+}
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-  const handleDateChange = (date: Date) => {
-    setSelectedDate(date);
-  };
-
-  const handleDatePickerClick = () => {
-    setShowDatePicker(true);
-  };
-
-  const handleClose = () => {
-    setShowDatePicker(false);
-  };
-
+const SearchHeader: React.FC<SearchHeaderProps> = ({
+  searchQuery,
+  setSearchQuery,
+  showDatePicker,
+  selectedDate,
+  handleDateChange,
+  setShowDatePicker,
+  minPrice,
+  maxPrice,
+  setMinPrice,
+  setMaxPrice,
+}) => {
   return (
     <div className="flex flex-col items-center mb-4">
       <div className="bg-blue-600 py-10 px-6 rounded-xl shadow-lg w-full">
@@ -57,7 +61,7 @@ const SearchHeader: React.FC = () => {
         {/* Date Sorting */}
         <button
           className="flex w-full items-center bg-white px-4 py-2"
-          onClick={handleDatePickerClick}
+          onClick={() => setShowDatePicker(true)}
         >
           <FaCalendarAlt className="text-blue-500 mr-2" />
           {selectedDate
@@ -66,9 +70,10 @@ const SearchHeader: React.FC = () => {
         </button>
         <DatePickerDialog
           isOpen={showDatePicker}
-          onClose={handleClose}
+          onClose={() => setShowDatePicker(false)}
           onDateChange={handleDateChange}
-          onSubmit={handleClose}
+          onSubmit={() => setShowDatePicker(false)}
+          btnText="Atur Tanggal"
         />
       </div>
     </div>

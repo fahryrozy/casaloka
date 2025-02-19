@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 interface Partner {
@@ -26,7 +27,7 @@ const partners: Partner[] = [
   },
   { name: "Dana Syariah", logo: "/assets/images/lsk-partner-3.png" },
   { name: "Hisan Townhouse", logo: "/assets/images/image 10.png" },
-  { name: "Kamang Kolonie", logo: "assets/images/image 11.png" },
+  { name: "Kamang Kolonie", logo: "/assets/images/image 11.png" },
   { name: "Hijra Bank", logo: "/assets/images/lsk-partner-1.png" },
   { name: "BTN Syariah", logo: "/assets/images/lsk-partner-2.pngg" },
   {
@@ -54,7 +55,9 @@ const OurPartners: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
           {partners.map((partner) => (
             <div key={partner.name} className="flex justify-center">
-              <img
+              <Image
+                width={100}
+                height={100}
                 src={partner.logo}
                 alt={partner.name}
                 className="h-16 w-auto object-contain"

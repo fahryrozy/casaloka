@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react"; // Use
-import { authenticate } from "@/action";
-import { submitLogin } from "../utils/api";
+import { signIn, SignInResponse } from "next-auth/react";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -18,11 +16,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
 
     return () => {
       document.body.style.overflow = "";
@@ -42,7 +37,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       console.log("📩 Sending login request with:", { username, password });
 
       // const result = await authenticate(username, password);
-      const result = await signIn("credentials", {
+      const result: SignInResponse | undefined = await signIn("credentials", {
         username,
         password,
         redirect: false,
@@ -51,7 +46,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
       console.log("🔍 Login result:", result);
 
-      if (result?.error) {
+      if (result?.error && result.code) {
         setError(result?.code);
       } else {
         if (onClose) onClose();
@@ -59,37 +54,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       setError("Unexpected error occurred. Please try again later.");
-      console.log("🚨 Log the error:", error.toString());
+      throw error;
     } finally {
       setLoading(false);
     }
   };
-
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError(null);
-  //   setLoading(true);
-
-  //   try {
-  //     const result = await submitLogin({
-  //       username,
-  //       user_type: "",
-  //       password,
-  //     });
-
-  //     if (result?.error) {
-  //       setError(result.message);
-  //     } else {
-  //       if (onClose) onClose();
-  //       router.refresh();
-  //     }
-  //   } catch (error) {
-  //     setError(error.response?.data?.message || "Unexpected error occurred.");
-  //     console.error("🚨 Log the error:", error.toString());
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   if (!isOpen) return null;
 

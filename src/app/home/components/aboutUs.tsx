@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const AboutUs: React.FC = () => {
   return (
     <section id="about-us" className="px-4 py-16">
@@ -17,9 +19,11 @@ const AboutUs: React.FC = () => {
           {/* Feature 1 */}
           <div className="text-center">
             <div className="flex items-center justify-center w-16 h-16 bg-primary rounded-full mx-auto mb-4">
-              <img
+              <Image
                 src="/assets/icons/halal.svg"
                 alt="Halal"
+                width={100}
+                height={100}
                 className="h-8 w-8"
               />
             </div>
@@ -33,9 +37,11 @@ const AboutUs: React.FC = () => {
           {/* Feature 2 */}
           <div className="text-center">
             <div className="flex items-center justify-center w-16 h-16 bg-primary rounded-full mx-auto mb-4">
-              <img
+              <Image
                 src="/assets/icons/exp.svg"
                 alt="Experience"
+                width={100}
+                height={100}
                 className="h-8 w-8"
               />
             </div>
@@ -47,9 +53,11 @@ const AboutUs: React.FC = () => {
           {/* Feature 3 */}
           <div className="text-center">
             <div className="flex items-center justify-center w-16 h-16 bg-primary rounded-full mx-auto mb-4">
-              <img
+              <Image
                 src="/assets/icons/service.svg"
                 alt="Service"
+                width={100}
+                height={100}
                 className="h-8 w-8"
               />
             </div>
@@ -64,9 +72,11 @@ const AboutUs: React.FC = () => {
           {/* Feature 4 */}
           <div className="text-center">
             <div className="flex items-center justify-center w-16 h-16 bg-primary rounded-full mx-auto mb-4">
-              <img
+              <Image
                 src="/assets/icons/commitments.svg"
                 alt="Commitment"
+                width={100}
+                height={100}
                 className="h-8 w-8"
               />
             </div>

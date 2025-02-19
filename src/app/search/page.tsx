@@ -1,60 +1,177 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Header from "../components/header";
-import Footer from "../components/footer";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import PropertyList from "./components/propertyList";
 import FilterSidebar from "./components/filterSideBar";
 import Pagination from "../components/pagination";
 import SearchHeader from "./components/searchHeader";
-import { getPropertyList } from "../utils/api";
+import { getPropertyList } from "../utils/api/services/propertyService";
 import SearchSkeleton from "./components/searchSkeleton";
+import { IPropertyListData } from "../utils/api/interfaces/IProperty";
+import { useSearchParams } from "next/navigation";
 
-export default function SearchPage() {
+function SearchPageContent() {
+  const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<IPropertyListData[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const propertiesPerPage = 5;
 
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(0);
+  const minPriceParams = searchParams.get("minPrice");
+  const maxPriceParams = searchParams.get("maxPrice");
+  const loc = searchParams.get("loc");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const [categories, setCategories] = useState<string[]>([]);
+  const [propertiesFilter, setPropertiesFilter] = useState<string[]>([]);
+  const [certifications, setCertifications] = useState<string[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  const [selectedProvince, setSelectedProvince] = useState<string>("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedVillage, setSelectedVillage] = useState<string>("");
+
+  const [filters, setFilters] = useState({});
+
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const data = await getPropertyList();
-        setProperties(data.data.datas);
-      } catch (error) {
+    setSelectedProvince(loc ? loc : "");
+    setMinPrice(minPriceParams ? parseInt(minPriceParams) : 0);
+    setMaxPrice(maxPriceParams ? parseInt(maxPriceParams) : 0);
+  }, [minPriceParams, maxPriceParams, loc]);
+
+  const fetchProperties = useCallback(async () => {
+    setIsLoading(true);
+    getPropertyList({
+      search: searchQuery,
+      current_page: currentPage.toString(),
+      page_size: propertiesPerPage.toString(),
+      filter: filters,
+    })
+      .then(({ properties, totalItems }) => {
+        setProperties(properties);
+        setTotalItems(totalItems);
+      })
+      .catch((error) => {
         console.error("Failed to fetch properties:", error);
-      } finally {
+      })
+      .finally(() => {
         setIsLoading(false);
-      }
+      });
+  }, [searchQuery, currentPage, propertiesPerPage, filters]);
+
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties, searchParams]);
+
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
+
+  const toggleFavorite = (propertyId: string) => {
+    setFavorites((prevFavorites) =>
+      prevFavorites.includes(propertyId)
+        ? prevFavorites.filter((id) => id !== propertyId)
+        : [...prevFavorites, propertyId]
+    );
+  };
+
+  const handleApplyFilters = () => {
+    const filter = {
+      harga_start: minPrice.toString(),
+      harga_end: maxPrice.toString(),
+      village_code: selectedVillage,
+      district_code: selectedDistrict,
+      city_code: selectedCity,
+      province_code: selectedProvince,
+      status_properti_name: "",
     };
 
-    fetchProperties();
-  }, []);
+    // Remove keys with values of 0 or empty string
+    const filteredFilter = Object.fromEntries(
+      Object.entries(filter).filter(
+        ([, value]) => value !== "0" && value !== ""
+      )
+    );
 
-  const indexOfLastProperty = currentPage * propertiesPerPage;
-  const indexOfFirstProperty = indexOfLastProperty - propertiesPerPage;
-  const currentProperties = properties.slice(
-    indexOfFirstProperty,
-    indexOfLastProperty
-  );
+    setFilters(filteredFilter);
+    setCurrentPage(1);
+    fetchProperties();
+  };
+
+  const handleResetFilters = () => {
+    setMinPrice(0);
+    setMaxPrice(0);
+    setSearchQuery("");
+    setSelectedDate(null);
+    setCategories([]);
+    setPropertiesFilter([]);
+    setCertifications([]);
+    setSelectedProvince("");
+    setSelectedCity("");
+    setSelectedDistrict("");
+    setSelectedVillage("");
+    setFilters({});
+    setCurrentPage(1);
+    fetchProperties();
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    fetchProperties();
   };
 
   return (
     <div className="flex flex-col overflow-x-hidden">
       <div className="flex flex-col sm:flex-row mt-20">
-        <FilterSidebar />
+        <FilterSidebar
+          categories={categories}
+          setCategories={setCategories}
+          properties={propertiesFilter}
+          setProperties={setPropertiesFilter}
+          certifications={certifications}
+          setCertifications={setCertifications}
+          selectedProvince={selectedProvince}
+          selectedCity={selectedCity}
+          selectedDistrict={selectedDistrict}
+          selectedVillage={selectedVillage}
+          setSelectedProvince={setSelectedProvince}
+          setSelectedCity={setSelectedCity}
+          setSelectedDistrict={setSelectedDistrict}
+          setSelectedVillage={setSelectedVillage}
+          handleApplyFilters={handleApplyFilters}
+          handleResetFilters={handleResetFilters}
+        />
         <div className="flex-grow p-4">
-          <SearchHeader />
+          <SearchHeader
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            showDatePicker={showDatePicker}
+            setShowDatePicker={setShowDatePicker}
+            selectedDate={selectedDate}
+            handleDateChange={handleDateChange}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            setMinPrice={setMinPrice}
+            setMaxPrice={setMaxPrice}
+          />
           {isLoading ? (
             <SearchSkeleton />
           ) : (
             <>
-              <PropertyList properties={currentProperties} />
+              <PropertyList
+                properties={properties}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+              />
               <Pagination
-                totalItems={properties.length}
+                totalItems={totalItems}
                 itemsPerPage={propertiesPerPage}
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
@@ -64,5 +181,13 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }

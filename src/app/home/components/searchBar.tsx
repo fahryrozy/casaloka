@@ -4,10 +4,17 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import PriceFilter from "@/app/components/priceFilter";
 import { FaMapMarkerAlt } from "react-icons/fa";
+import { fetchProvinces } from "@/app/utils/api/services/regionService"; // Import the fetchProvinces function
+
+interface Province {
+  code: string;
+  name: string;
+}
 
 const SearchBar: React.FC = () => {
   const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [provinces, setProvinces] = useState<Province[]>([]); // State to store provinces
 
   const [isPriceError, setIsPriceError] = useState<boolean>(false);
   const [minPrice, setMinPrice] = useState<number>(0);
@@ -21,6 +28,20 @@ const SearchBar: React.FC = () => {
     }
   }, [minPrice, maxPrice]);
 
+  useEffect(() => {
+    // Fetch provinces when the component mounts
+    const fetchProvincesData = async () => {
+      try {
+        const data = await fetchProvinces();
+        setProvinces(data);
+      } catch (error) {
+        console.error("Failed to fetch provinces:", error);
+      }
+    };
+
+    fetchProvincesData();
+  }, []);
+
   const handleLocationChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -31,7 +52,7 @@ const SearchBar: React.FC = () => {
     const query = new URLSearchParams();
     if (minPrice !== 0) query.append("minPrice", minPrice.toString());
     if (maxPrice !== 0) query.append("maxPrice", maxPrice.toString());
-    if (selectedLocation) query.append("location", selectedLocation);
+    if (selectedLocation) query.append("loc", selectedLocation);
     router.push(`/search?${query.toString()}`);
   };
 
@@ -58,8 +79,11 @@ const SearchBar: React.FC = () => {
                 <option value="" disabled>
                   Select option
                 </option>
-                <option value="jakarta">Jakarta</option>
-                <option value="bandung">Bandung</option>
+                {provinces.map((province) => (
+                  <option key={province.code} value={province.code}>
+                    {province.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

@@ -6,14 +6,17 @@ import LoginModal from "./login";
 import SmoothScrollLink from "./smoothScrollLink";
 import SideNav from "./sideNav";
 import { signOut, useSession } from "next-auth/react";
+// import { submitLogout } from "../utils/api/services/authService";
 
 const Header: React.FC = () => {
   const { data: session } = useSession();
+  console.log("Session => ", session);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     console.log("Menu is open", isMenuOpen);
@@ -29,6 +32,14 @@ const Header: React.FC = () => {
       .map((n) => n[0])
       .join("");
     return initials.toUpperCase();
+  };
+
+  const handleLogout = async () => {
+    // const response = await submitLogout();
+    // if (response.status === 200) {
+    //   signOut();
+    // }
+    signOut();
   };
 
   return (
@@ -86,7 +97,7 @@ const Header: React.FC = () => {
                         Favorites
                       </button>
                       <button
-                        onClick={() => signOut()}
+                        onClick={() => handleLogout()}
                         className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
                       >
                         Sign out

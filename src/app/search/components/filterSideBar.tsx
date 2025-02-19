@@ -1,51 +1,129 @@
 import React from "react";
+import LocationFilter from "./locationFilter";
 
-const FilterSidebar = () => {
+interface FilterSidebarProps {
+  categories: string[];
+  setCategories: (categories: string[]) => void;
+  properties: string[];
+  setProperties: (properties: string[]) => void;
+  certifications: string[];
+  setCertifications: (certifications: string[]) => void;
+  selectedProvince: string;
+  selectedCity: string;
+  selectedDistrict: string;
+  selectedVillage: string;
+  setSelectedProvince: (province: string) => void;
+  setSelectedCity: (city: string) => void;
+  setSelectedDistrict: (district: string) => void;
+  setSelectedVillage: (village: string) => void;
+  handleApplyFilters: () => void;
+  handleResetFilters: () => void;
+}
+
+const FilterSidebar: React.FC<FilterSidebarProps> = ({
+  categories,
+  properties,
+  certifications,
+  selectedProvince,
+  selectedCity,
+  selectedDistrict,
+  selectedVillage,
+  setSelectedProvince,
+  setSelectedCity,
+  setSelectedDistrict,
+  setSelectedVillage,
+  handleApplyFilters,
+  handleResetFilters,
+}) => {
   return (
-    <div className="hidden sm:flex flex-col sm:w-64 bg-white shadow-lg p-4">
-      <h3 className="font-bold mb-4">Kategori</h3>
-      <ul className="space-y-2">
-        <li>
-          <label>
-            <input type="checkbox" className="mr-2" /> Baru
-          </label>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" className="mr-2" /> Bekas
-          </label>
-        </li>
-        <h3 className="font-bold mt-6 mb-4">Properti</h3>
-        <li>
-          <label>
-            <input type="checkbox" className="mr-2" /> Digital Rumah & Apartemen
-          </label>
-        </li>
-      </ul>
+    <div className="hidden sm:flex flex-col sm:w-64 shadow-lg p-2 gap-2">
+      <div className="flex flex-col gap-2">
+        <h3 className="bg-white font-bold mb-4">Kategori</h3>
+        <ul>
+          <li>
+            <label>
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={categories.includes("Baru")}
+                onChange={() => {}}
+              />
+              Baru
+            </label>
+          </li>
+          <li>
+            <label>
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={categories.includes("Bekas")}
+                onChange={() => {}}
+              />
+              Bekas
+            </label>
+          </li>
+        </ul>
+        <hr />
+      </div>
+      <div className="flex flex-col gap-4">
+        <h3 className="font-bold">Properti</h3>
+        <ul className="space-y-2">
+          <li>
+            <label>
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={properties.includes("Digital Rumah & Apartemen")}
+                onChange={() => {}}
+              />
+              Digital Rumah & Apartemen
+            </label>
+          </li>
+        </ul>
+        <hr />
+      </div>
 
-      <h3 className="font-bold mt-6 mb-4">Indonesia</h3>
-      <ul className="space-y-2">
-        <li>
-          <label>
-            <input type="checkbox" className="mr-2" /> DKI Jakarta
-          </label>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" className="mr-2" /> Jawa Barat
-          </label>
-        </li>
-      </ul>
-
-      <h3 className="font-bold mt-6 mb-4">Sertifikasi</h3>
-      <ul className="space-y-2">
-        <li>
-          <label>
-            <input type="checkbox" className="mr-2" /> SHM - Sertifikat Hak
-            Milik
-          </label>
-        </li>
-      </ul>
+      <LocationFilter
+        selectedProvince={selectedProvince}
+        selectedCity={selectedCity}
+        selectedDistrict={selectedDistrict}
+        selectedVillage={selectedVillage}
+        setSelectedProvince={setSelectedProvince}
+        setSelectedCity={setSelectedCity}
+        setSelectedDistrict={setSelectedDistrict}
+        setSelectedVillage={setSelectedVillage}
+      />
+      <hr />
+      <div className="flex flex-col gap-2">
+        <h3 className="font-bold">Sertifikasi</h3>
+        <ul className="space-y-2">
+          <li>
+            <label>
+              <input
+                type="checkbox"
+                className="mr-2"
+                checked={certifications.includes("SHM - Sertifikat Hak Milik")}
+                onChange={() => {}}
+              />
+              SHM - Sertifikat Hak Milik
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div className="flex justify-center gap-4 mt-10 items-end">
+        <button
+          onClick={handleApplyFilters}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+        >
+          Apply
+        </button>
+        <button
+          onClick={handleResetFilters}
+          className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+        >
+          Reset
+        </button>
+      </div>
     </div>
   );
 };

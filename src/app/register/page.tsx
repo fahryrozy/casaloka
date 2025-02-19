@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Header from "../components/header";
-import { submitRegister } from "@/app/utils/api";
+import { submitRegister } from "@/app/utils/api/services/authService";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
