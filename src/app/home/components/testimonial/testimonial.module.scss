@@ -1,0 +1,56 @@
+.testimonialSection {
+  @apply relative text-white pt-2;
+  background-image: url("/assets/images/testi-bg.png");
+  background-size: cover; /* Ensure the image covers the entire section */
+  background-position: right;
+  position: relative; /* Needed for layering */
+
+  /* Add a pseudo-element for the color overlay */
+  &::before {
+    content: "";
+    @apply absolute inset-0 bg-gradient-to-r from-[#378DFF] to-transparent;
+    opacity: 7.75;
+  }
+
+  /* Ensure the content is above the overlay */
+  * {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+.testimonialHeader {
+  @apply px-8 rounded-br-3xl absolute top-0 left-0 font-semibold text-base bg-[#00357C];
+}
+
+.testimonialContainer {
+  @apply w-full px-8 flex flex-wrap items-center;
+}
+
+.testimonialContentWrapper {
+  @apply w-full flex mt-8;
+}
+
+.testimonialContent {
+  @apply w-full sm:w-2/3 py-2;
+}
+
+.quoteContainer {
+  @apply flex items-center mb-4;
+}
+
+.quoteText {
+  @apply z-10 text-base sm:text-2xl font-bold mb-4;
+}
+
+.quoteAuthor {
+  @apply text-xl font-medium;
+}
+
+.testimonialImageContainer {
+  @apply sm:w-1/3 flex justify-center md:mt-0;
+}
+
+.testimonialImage {
+  @apply w-full sm:w-2/3 mt-6 md:mt-0;
+}

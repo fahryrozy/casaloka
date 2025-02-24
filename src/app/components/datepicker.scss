@@ -1,0 +1,29 @@
+/* Fullscreen DatePicker */
+.react-datepicker {
+  @apply w-full flex flex-col justify-center items-center;
+  border: 0 !important;
+  width: 100% !important;
+}
+
+.react-datepicker__header {
+  @apply bg-white text-white;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  @apply w-10 py-3 items-center justify-center;
+}
+
+.react-datepicker__current-month {
+  @apply text-xl;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  @apply bg-blue-800 text-white;
+}
+
+.react-datepicker__day--today {
+  @apply font-bold text-gray-500;
+}

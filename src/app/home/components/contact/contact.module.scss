@@ -1,0 +1,55 @@
+.contactSection {
+  @apply flex justify-center items-center px-4 py-12 bg-white;
+}
+
+.contactContainer {
+  @apply bg-primary w-[100%] sm:w-[90%] mt-10 p-4 sm:p-12 rounded-2xl flex flex-col lg:flex-row gap-4 sm:gap-8;
+  background-image: url("/assets/images/contact-bg.png"); /* Background image */
+  background-size: cover;
+  background-position: center;
+
+  * {
+    position: relative;
+    z-index: 2; /* Ensure content is above overlay */
+  }
+}
+
+.contactText {
+  @apply text-white flex-1 text-xl sm:text-3xl lg:text-4xl font-bold leading-snug;
+}
+
+.contactHighlight {
+  @apply text-yellow-400; /* Highlighted text */
+}
+
+.contactFormContainer {
+  @apply bg-white shadow-lg rounded-lg p-8 flex-1;
+}
+
+.contactForm {
+  @apply space-y-4;
+}
+
+.inputField {
+  @apply w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none;
+}
+
+.inputIcon {
+  @apply absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400;
+}
+
+.checkboxContainer {
+  @apply flex items-center space-x-2 mb-8;
+}
+
+.checkbox {
+  @apply w-4 h-4;
+}
+
+.checkboxLabel {
+  @apply text-sm text-gray-600;
+}
+
+.submitButton {
+  @apply w-full bg-primary text-white py-3 rounded-md hover:bg-blue-700;
+}

@@ -1,0 +1,46 @@
+.blogSection {
+  @apply relative bg-primary text-white p-4;
+  background-image: url("/assets/images/blog-bg.png"); /* Add the background image */
+  background-size: cover;
+  background-position: center;
+}
+
+.blogContainer {
+  @apply mt-4 container mx-auto;
+}
+
+.blogHeader {
+  @apply flex justify-between items-center mb-8;
+}
+
+.blogTitle {
+  @apply text-3xl font-bold;
+}
+
+.blogLink {
+  @apply font-medium hover:underline;
+}
+
+.blogGrid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.blogCard {
+  @apply bg-transparent overflow-hidden;
+}
+
+.blogCardImage {
+  @apply w-full rounded-md h-48 object-cover;
+}
+
+.blogCardContent {
+  @apply p-4;
+}
+
+.blogCardAuthor {
+  @apply text-sm;
+}
+
+.blogCardTitle {
+  @apply text-base mt-2;
+}
